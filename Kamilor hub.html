@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KamilorHub - Script Hub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); 
+            color: #fff; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+        }
+        .login-container { 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; 
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); 
+        }
+        .login-box { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 40px; border-radius: 15px; backdrop-filter: blur(10px); 
+            width: 100%; max-width: 400px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
+        }
+        .login-box h1 { 
+            text-align: center; margin-bottom: 10px; font-size: 2.5em; 
+            background: linear-gradient(45deg, #00d4ff, #7c3aed); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            background-clip: text; 
+        }
+        .login-box p { text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 30px; font-size: 0.9em; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; color: rgba(255,255,255,0.9); font-weight: 500; }
+        .input-group input { 
+            width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.2); 
+            background: rgba(255,255,255,0.05); color: #fff; border-radius: 8px; 
+            font-size: 1em; transition: all 0.3s; 
+        }
+        .input-group input:focus { outline: none; border-color: #00d4ff; background: rgba(0,212,255,0.05); }
+        .login-btn { 
+            width: 100%; padding: 12px; background: linear-gradient(45deg, #00d4ff, #7c3aed); 
+            border: none; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer; 
+            font-size: 1em; transition: all 0.3s; margin-bottom: 15px; 
+        }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,212,255,0.4); }
+        .login-btn:active { transform: translateY(0); }
+        .error { 
+            background: rgba(255,59,48,0.2); border: 1px solid #ff3b30; color: #ff6b6b; 
+            padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; text-align: center; 
+        }
+        .error.show { display: block; }
+        .discord-link { text-align: center; margin-top: 20px; }
+        .discord-link a { color: #5865f2; text-decoration: none; font-weight: 500; transition: all 0.3s; }
+        .discord-link a:hover { text-decoration: underline; }
+        .main-container { display: none; min-height: 100vh; padding: 20px; }
+        .main-container.active { display: block; }
+        .header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .header h1 { 
+            font-size: 3em; background: linear-gradient(45deg, #00d4ff, #7c3aed); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            background-clip: text; margin-bottom: 10px; 
+        }
+        .header p { color: rgba(255,255,255,0.7); margin-bottom: 15px; }
+        .header-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .header-buttons button { 
+            padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); 
+            color: #fff; border-radius: 8px; cursor: pointer; transition: all 0.3s; 
+        }
+        .header-buttons button:hover { background: rgba(0,212,255,0.2); border-color: #00d4ff; }
+        .scripts-container { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; max-width: 1200px; margin: 0 auto; 
+        }
+        .script-card { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 25px; border-radius: 12px; backdrop-filter: blur(10px); 
+            transition: all 0.3s; cursor: pointer; 
+        }
+        .script-card:hover { 
+            transform: translateY(-5px); border-color: #00d4ff; 
+            background: rgba(0,212,255,0.05); box-shadow: 0 8px 32px rgba(0,212,255,0.2); 
+        }
+        .script-card h3 { color: #00d4ff; margin-bottom: 10px; font-size: 1.3em; }
+        .script-card p { color: rgba(255,255,255,0.7); margin-bottom: 15px; font-size: 0.95em; }
+        .script-status { 
+            display: inline-block; padding: 5px 12px; background: rgba(76,175,80,0.2); 
+            border: 1px solid #4caf50; color: #4caf50; border-radius: 5px; 
+            font-size: 0.85em; margin-bottom: 15px; 
+        }
+        .script-status.new { 
+            background: rgba(255,193,7,0.2); border-color: #ffc107; color: #ffc107; 
+        }
+        .button-group { display: flex; gap: 10px; }
+        .copy-btn, .execute-btn { 
+            flex: 1; padding: 10px; border: none; border-radius: 8px; 
+            cursor: pointer; font-weight: 500; transition: all 0.3s; font-size: 0.9em; 
+        }
+        .copy-btn { 
+            background: rgba(100,200,255,0.3); color: #64c8ff; border: 1px solid #64c8ff; 
+        }
+        .copy-btn:hover { background: rgba(100,200,255,0.5); }
+        .execute-btn { 
+            background: linear-gradient(45deg, #00d4ff, #7c3aed); color: #fff; 
+        }
+        .execute-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(0,212,255,0.4); }
+        .notification { 
+            position: fixed; top: 20px; right: 20px; background: rgba(76,175,80,0.9); 
+            color: #fff; padding: 15px 25px; border-radius: 8px; display: none; 
+            z-index: 1000; animation: slideIn 0.3s ease; 
+        }
+        .notification.show { display: block; }
+        @keyframes slideIn { 
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .logout-btn { 
+            position: fixed; top: 20px; left: 20px; padding: 10px 20px; 
+            background: rgba(255,59,48,0.3); border: 1px solid #ff3b30; 
+            color: #ff6b6b; border-radius: 8px; cursor: pointer; 
+            transition: all 0.3s; z-index: 100; 
+        }
+        .logout-btn:hover { background: rgba(255,59,48,0.5); }
+        @media (max-width: 768px) { 
+            .login-box { margin: 20px; } 
+            .header h1 { font-size: 2em; } 
+            .scripts-container { grid-template-columns: 1fr; } 
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h1>KamilorHub</h1>
+            <p>Script Hub Elite</p>
+            <div class="error" id="errorMessage"></div>
+            <div class="input-group">
+                <label for="keyInput">Ingresa tu Key:</label>
+                <input type="password" id="keyInput" placeholder="Escribe aquí tu key..." onkeypress="if(event.key==='Enter') login()">
+            </div>
+            <button class="login-btn" onclick="login()">Acceder</button>
+            <div class="discord-link">
+                <p style="margin-bottom: 10px; color: rgba(255,255,255,0.7); font-size: 0.9em;">¿No tienes key?</p>
+                <a href="https://discord.gg/BPWF6Gycc" target="_blank">Únete a nuestro Discord</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRINCIPAL -->
+    <div class="main-container" id="mainContainer">
+        <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+        <div class="header">
+            <h1>KamilorHub</h1>
+            <p>Scripts Exclusivos - Versión 1.0</p>
+            <div class="header-buttons">
+                <button onclick="copyAllScripts()">📋 Copiar Todo</button>
+                <button onclick="copyDiscord()">🔗 Discord</button>
+            </div>
+        </div>
+        <div class="scripts-container">
+            <div class="script-card">
+                <h3>🎮 Mega Menu</h3>
+                <span class="script-status">Funcionando</span>
+                <p>Script mega menú con interfaz completa y opciones avanzadas.</p>
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyToClipboard('script1')">Copiar</button>
+                    <button class="execute-btn" onclick="executeScript('script1')">Ejecutar</button>
+                </div>
+                <textarea id="script1" style="display:none;">loadstring(game:HttpGet("https://gist.githubusercontent.com/pavronal-ai/d384f7234a20751e56a243b52e3caa62/raw/5dcaf3cbb1cc6efd51155f80ec1ec039dd4823a5/Mega%2520hub%2520kamilor.lua"))()</textarea>
+            </div>
+            <div class="script-card">
+                <h3>🎯 Aimbot Avanzado</h3>
+                <span class="script-status new">NUEVO</span>
+                <p>Aimbot de última generación con ajustes precisos.</p>
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyToClipboard('script2')">Copiar</button>
+                    <button class="execute-btn" onclick="executeScript('script2')">Ejecutar</button>
+                </div>
+                <textarea id="script2" style="display:none;">loadstring(game:HttpGet("https://gist.githubusercontent.com/pavronal-ai/6f4b478860fce550a6c8f416f61c1d32/raw/401f5af380dfb8a1932bcbdfdea19730afad9e28/Kamilor%2520hub%2520Aimbot.lua"))()</textarea>
+            </div>
+            <div class="script-card">
+                <h3>✨ Nuevo Menú</h3>
+                <span class="script-status new">NUEVO</span>
+                <p>Interfaz redesñada con mejor rendimiento.</p>
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyToClipboard('script3')">Copiar</button>
+                    <button class="execute-btn" onclick="executeScript('script3')">Ejecutar</button>
+                </div>
+                <textarea id="script3" style="display:none;">loadstring(game:HttpGet("https://gist.githubusercontent.com/pavronal-ai/5278f45564b0651acbe32e935cc6c6d4/raw/e43f4c93a4eab95457bd590c39bc9e332cba342c/Mega%2520hub%2520kamiloowr.lua"))()</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="notification" id="notification"></div>
+
+    <script>
+        const CORRECT_KEY = "oisusnsksushsbnsmskaiauahahnamaka8aiwjwjmsksososisiusjskskskskskk";
+        function login() {
+            const keyInput = document.getElementById('keyInput').value;
+            const errorDiv = document.getElementById('errorMessage');
+            if (keyInput === CORRECT_KEY) {
+                localStorage.setItem('kamilorHub_authenticated', 'true');
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('mainContainer').classList.add('active');
+                showNotification('¡Bienvenido a KamilorHub! 🎉', 'success');
+                errorDiv.classList.remove('show');
+            } else {
+                errorDiv.classList.add('show');
+                errorDiv.textContent = '❌ Key inválida. Ve a Discord.';
+            }
+        }
+        function logout() {
+            localStorage.removeItem('kamilorHub_authenticated');
+            document.getElementById('mainContainer').classList.remove('active');
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('keyInput').value = '';
+        }
+        function copyToClipboard(scriptId) {
+            const scriptContent = document.getElementById(scriptId).value;
+            navigator.clipboard.writeText(scriptContent).then(() => {
+                showNotification('✅ Script copiado', 'success');
+            });
+        }
+        function copyAllScripts() {
+            const script1 = document.getElementById('script1').value;
+            const script2 = document.getElementById('script2').value;
+            const script3 = document.getElementById('script3').value;
+            const allScripts = `-- KAMILORHUB SCRIPTS
+
+${script1}
+
+${script2}
+
+${script3}`;
+            navigator.clipboard.writeText(allScripts).then(() => {
+                showNotification('✅ Todos los scripts copiados', 'success');
+            });
+        }
+        function copyDiscord() {
+            navigator.clipboard.writeText('https://discord.gg/BPWF6Gycc').then(() => {
+                showNotification('✅ Discord copiado', 'success');
+            });
+        }
+        function executeScript(scriptId) {
+            showNotification('⚙️ Script listo para executor', 'info');
+        }
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        }
+        window.addEventListener('load', function() {
+            if (localStorage.getItem('kamilorHub_authenticated') === 'true') {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('mainContainer').classList.add('active');
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('keyInput').focus();
+        });
+    </script>
+</body>
+</html>
